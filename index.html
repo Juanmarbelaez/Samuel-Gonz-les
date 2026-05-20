@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
-<title>Interfaz 05/05/2026</title>
+<title>Interfaz 20/05/2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -109,16 +109,31 @@ body{background:#f0f7f3 !important;font-family:'Plus Jakarta Sans',sans-serif;mi
 .restds{font-size:12.5px;color:var(--subtle);margin-bottom:14px;line-height:1.5}
 .sessitem{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:13px;color:var(--txt);border-bottom:1px solid var(--bdr2)}
 .sessitem:last-child{border-bottom:none}
+/* CRONOGRAMA */
+.schd{padding:14px 20px 4px}
+.blk-card{background:var(--card);border:1px solid var(--bdr2);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:10px}
+.blk-hd{padding:12px 14px 10px;border-left:4px solid var(--primary);background:var(--pale)}
+.blk-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--txt);letter-spacing:.01em}
+.blk-range{font-size:10.5px;color:var(--subtle);font-weight:600;margin-top:2px}
+.blk-body{padding:4px 0}
+.blk-item{display:flex;align-items:baseline;gap:10px;padding:8px 14px;border-bottom:1px solid var(--bdr2)}
+.blk-item:last-child{border-bottom:none}
+.blk-itime{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--primary);min-width:62px;flex-shrink:0}
+.blk-idesc{font-size:13px;color:var(--txt);line-height:1.4}
+.schd-weekend{padding:22px 16px;background:var(--card);border:1px solid var(--bdr2);border-radius:14px;box-shadow:var(--shadow-sm);text-align:center}
+.schd-weekend-lbl{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--muted);margin-bottom:6px}
+.schd-weekend-sub{font-size:12.5px;color:var(--subtle);line-height:1.5}
 .note{margin:0 20px 6px;padding:9px 14px;background:var(--pale);border:1px solid var(--bdr);border-radius:10px;font-size:11px;color:var(--primary);font-weight:600;text-align:center}
 </style>
 </head>
+
 <body>
 <div id="app">
   <div class="hdr">
     <div class="hdr-l">
       <span class="brand">Fundamental VIP</span>
       <span class="hname">Samuel González</span>
-      <span class="hdate">Interfaz 05/05/2026</span>
+      <span class="hdate">Interfaz 20/05/2026</span>
     </div>
   </div>
   <div class="dbar" id="dbar"></div>
@@ -556,6 +571,7 @@ function renderMain(){
     <div class="tbar">
       <button class="tbtn${tab==='c'?' sel':''}" onclick="setTab('c')">Comidas</button>
       <button class="tbtn${tab==='t'?' sel':''}" onclick="setTab('t')">Entrenamiento</button>
+      <button class="tbtn${tab==='r'?' sel':''}" onclick="setTab('r')">Rutina</button>
     </div>
     <div id="content" class="fade-in"></div>`;
   renderContent();
@@ -633,7 +649,84 @@ function renderTrain(){
   document.getElementById('content').innerHTML=h;
 }
 
-function renderContent(){tab==='c'?renderMeals():renderTrain();}
+function renderContent(){
+  if(tab==='c') renderMeals();
+  else if(tab==='t') renderTrain();
+  else renderSchedule();
+}
+
+// ── SCHEDULE ──────────────────────────────────────────────────
+const BLOCKS=[
+  {label:'Mañana',color:'#47b573',time:'5:30 – 6:05',items:[
+    {t:'5:30',d:'Levantarse y alistarse'},
+    {t:'5:50 – 6:05',d:'Ordenar lo que llevarás al colegio, tender la cama y meditar 5 minutos'},
+  ]},
+  {label:'Estudio',color:'#2d8653',time:'6:05 – 15:00',items:[
+    {t:'6:05',d:'Salir para el colegio'},
+    {t:'9:30',d:'Desayuno'},
+    {t:'12:30',d:'Almuerzo'},
+  ]},
+  {label:'Entrenamiento',color:'#1e6b3e',time:'15:15 – 16:40',items:[
+    {t:'15:15',d:'Hidratarte con agua, limón y un toque de sal — en camino al gym'},
+    {t:'15:20 – 16:35',d:'Entrenar en el gym'},
+    {t:'16:35',d:'Cardio después de la rutina'},
+  ]},
+  {label:'Resto de la tarde',color:'#29845a',time:'16:50 – 18:30',items:[
+    {t:'16:50',d:'Volver a casa'},
+    {t:'17:00',d:'Cocinar cena y almuerzo del día siguiente'},
+    {t:'17:30',d:'Cenar'},
+    {t:'18:00',d:'Tiempo libre — terminar cosas pendientes'},
+    {t:'18:30',d:'Bajar la iluminación ambiental y bloquear luz azul'},
+  ]},
+  {label:'Noche',color:'#1a5c35',time:'19:30 – 20:30',items:[
+    {t:'19:30 – 19:45',d:'Cerrar el día, planear el próximo, dejar el celular y alistar maleta y uniforme del día siguiente'},
+    {t:'19:45',d:'Cepillarte y darte una ducha tibia'},
+    {t:'20:00',d:'Leer'},
+    {t:'20:30',d:'Dormir en un cuarto completamente oscuro, silencioso y frío'},
+  ]},
+];
+
+const WEEKEND_BLOCKS=[
+  {label:'Mañana',color:'#47b573',time:'5:30 – 6:05',items:[
+    {t:'5:30',d:'Levantarse y alistarse'},
+    {t:'5:50 – 6:05',d:'Ordenar, tender la cama y meditar 5 minutos'},
+  ]},
+  {label:'Mañana libre',color:'#2d8653',time:'6:05 – 13:00',items:[
+    {t:'6:05',d:'Tiempo libre de la mañana'},
+    {t:'8:00',d:'Desayuno'},
+    {t:'~10:00',d:'Caminata de una hora al aire libre'},
+  ]},
+  {label:'Tarde',color:'#29845a',time:'13:00 – 18:30',items:[
+    {t:'13:00',d:'Almuerzo'},
+    {t:'17:30',d:'Cenar'},
+    {t:'18:00',d:'Tiempo libre — terminar cosas pendientes'},
+    {t:'18:30',d:'Bajar la iluminación ambiental y bloquear luz azul'},
+  ]},
+  {label:'Noche',color:'#1a5c35',time:'19:30 – 20:30',items:[
+    {t:'19:30 – 19:45',d:'Cerrar el día, planear el próximo, dejar el celular y alistar lo necesario para el día siguiente'},
+    {t:'19:45',d:'Cepillarte y darte una ducha tibia'},
+    {t:'20:00',d:'Leer'},
+    {t:'20:30',d:'Dormir en un cuarto completamente oscuro, silencioso y frío'},
+  ]},
+];
+
+function renderSchedule(){
+  const isWeekday=day<=4;
+  const blocks=isWeekday?BLOCKS:WEEKEND_BLOCKS;
+  const cards=blocks.map(b=>`
+    <div class="blk-card">
+      <div class="blk-hd" style="border-left-color:${b.color};">
+        <div class="blk-label">${b.label}</div>
+        <div class="blk-range">${b.time}</div>
+      </div>
+      <div class="blk-body">
+        ${b.items.map(i=>`<div class="blk-item"><div class="blk-itime">${i.t}</div><div class="blk-idesc">${i.d}</div></div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('content').innerHTML=`
+    <div class="schd">${cards}</div>
+    <div style="height:18px;"></div>`;
+}
 
 // ── EVENTS ────────────────────────────────────────────────────
 window.setDay=function(i){tap(90,.09,.1);day=i;snack=false;renderBar();renderMain();};
